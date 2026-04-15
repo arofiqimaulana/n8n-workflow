@@ -1,0 +1,633 @@
+{
+  "name": "AI Assistant That Finds the Perfect n8n Workflow for You (RAG + Gemini)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const result = [];\n\nfor (const item of $input.all()) {\n  const templates = item.json.templates || [];\n\n  for (const t of templates) {\n    result.push({\n      json: {\n        pageContent: `Template: ${t.name}\nDescription: ${t.description}\nUse cases: ${(t.use_case || []).join(', ')}\nApps: ${(t.apps || []).join(', ')}\nDifficulty: ${t.difficulty}\nSetup notes: ${t.setup_notes || ''}`,\n        metadata: {\n          name: t.name,\n          difficulty: t.difficulty,\n          apps: t.apps || [],\n          use_case: t.use_case || [],\n          categories: t.categories || [],\n          tags: t.tags || []\n        }\n      }\n    });\n  }\n}\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        160
+      ],
+      "id": "39bc3042-9898-4e16-b89e-de47df75556e",
+      "name": "Code in JavaScript",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5532e9de-ce07-45b2-98b4-89a44f7cf815",
+              "name": "templates",
+              "value": "[   {     \"name\": \"Telegram AI chatbot\",     \"description\": \"Handles incoming Telegram messages, uses OpenAI to answer chat requests, and can also generate images based on supported commands.\",     \"use_case\": [       \"ai chatbot\",       \"telegram automation\",       \"customer support\",       \"ai image generation\"     ],     \"apps\": [       \"Telegram\",       \"OpenAI\"     ],     \"difficulty\": \"beginner\",     \"setup_notes\": \"Requires Telegram bot credentials and OpenAI API access. Configure supported commands and response behavior before enabling the workflow.\",     \"categories\": [       \"Support Chatbot\",       \"AI Chatbot\"     ],     \"key_features\": [       \"telegram message trigger\",       \"ai-generated replies\",       \"image generation via command\",       \"unsupported command handling\"     ],     \"workflow_steps\": [       \"Listen for incoming Telegram messages\",       \"Check whether the message is a chat request or command\",       \"Send the content to OpenAI\",       \"Return a text or image response to Telegram\",       \"Handle unsupported commands gracefully\"     ],     \"tags\": [       \"telegram\",       \"chatbot\",       \"openai\",       \"support\",       \"automation\"     ],     \"required_credentials\": [       \"Telegram API\",       \"OpenAI API\"     ]   },   {     \"name\": \"Create AI-summarized email digests from Gmail labels with OpenAI o4-mini\",     \"description\": \"Fetches Gmail messages from a chosen label, summarizes them with OpenAI, combines the summaries into one digest, and emails the digest back to your inbox.\",     \"use_case\": [       \"email summarization\",       \"gmail automation\",       \"daily digest\",       \"productivity automation\"     ],     \"apps\": [       \"Gmail\",       \"OpenAI\"     ],     \"difficulty\": \"beginner\",     \"setup_notes\": \"Requires Gmail and OpenAI credentials. Configure the Gmail label to monitor and the destination inbox for the digest email.\",     \"categories\": [       \"AI Summarization\",       \"Email Automation\"     ],     \"key_features\": [       \"scheduled execution\",       \"gmail label filtering\",       \"ai summaries\",       \"digest email generation\"     ],     \"workflow_steps\": [       \"Run on a daily schedule\",       \"Fetch Gmail messages from a specific label\",       \"Summarize each email using OpenAI\",       \"Combine all summaries into one digest\",       \"Send the digest email\"     ],     \"tags\": [       \"gmail\",       \"openai\",       \"email-digest\",       \"summarization\",       \"productivity\"     ],     \"required_credentials\": [       \"Gmail OAuth2\",       \"OpenAI API\"     ]   },   {     \"name\": \"Automate lead management from website forms to Google Sheets and Slack\",     \"description\": \"Captures website form submissions, stores lead details in Google Sheets, and sends notifications to Slack for follow-up.\",     \"use_case\": [       \"lead capture\",       \"crm automation\",       \"sales operations\",       \"form automation\"     ],     \"apps\": [       \"Webhook\",       \"Google Sheets\",       \"Slack\"     ],     \"difficulty\": \"beginner\",     \"setup_notes\": \"Requires a webhook endpoint, Google Sheets OAuth2, and Slack OAuth2 or bot credentials. Prepare the destination spreadsheet columns before use.\",     \"categories\": [       \"Lead Management\",       \"Sales Automation\"     ],     \"key_features\": [       \"form submission capture\",       \"sheet logging\",       \"slack lead notifications\",       \"simple lead pipeline\"     ],     \"workflow_steps\": [       \"Receive website form submission via webhook\",       \"Extract lead fields\",       \"Append the data to Google Sheets\",       \"Send a Slack notification to the team\"     ],     \"tags\": [       \"leads\",       \"google-sheets\",       \"slack\",       \"webhook\",       \"sales\"     ],     \"required_credentials\": [       \"Google Sheets OAuth2\",       \"Slack OAuth2 or Bot Token\"     ]   },   {     \"name\": \"Auto-generate and approve social media posts from RSS feeds with OpenAI and Telegram\",     \"description\": \"Monitors RSS feeds, turns articles into social media post drafts using OpenAI, stores them in NocoDB, and uses Telegram for human approval.\",     \"use_case\": [       \"content automation\",       \"social media drafting\",       \"rss monitoring\",       \"approval workflow\"     ],     \"apps\": [       \"RSS Feed\",       \"OpenAI\",       \"NocoDB\",       \"Telegram\"     ],     \"difficulty\": \"intermediate\",     \"setup_notes\": \"Requires RSS source, OpenAI access, NocoDB database setup, and a Telegram bot for approval messages.\",     \"categories\": [       \"Content Creation\",       \"Social Media\"     ],     \"key_features\": [       \"rss feed polling\",       \"ai post generation\",       \"human approval via telegram\",       \"draft storage in nocodb\"     ],     \"workflow_steps\": [       \"Poll the RSS feed for new articles\",       \"Generate a post draft with OpenAI\",       \"Store the draft in NocoDB\",       \"Send approval request through Telegram\",       \"Publish or reject based on review\"     ],     \"tags\": [       \"rss\",       \"openai\",       \"telegram\",       \"nocodb\",       \"social-media\"     ],     \"required_credentials\": [       \"OpenAI API\",       \"NocoDB\",       \"Telegram API\"     ]   },   {     \"name\": \"Extract business leads from Gmail to Google Sheets with Slack notifications\",     \"description\": \"Parses incoming Gmail messages, filters out personal or generic addresses, extracts company lead data, writes it to Google Sheets, and notifies Slack.\",     \"use_case\": [       \"lead extraction\",       \"email parsing\",       \"sales prospecting\",       \"gmail automation\"     ],     \"apps\": [       \"Gmail\",       \"Google Sheets\",       \"Slack\"     ],     \"difficulty\": \"intermediate\",     \"setup_notes\": \"Requires Gmail, Google Sheets, and Slack credentials. Configure filtering logic for personal, generic, and system addresses.\",     \"categories\": [       \"Lead Management\",       \"Email Automation\"     ],     \"key_features\": [       \"gmail lead parsing\",       \"email filtering\",       \"google sheets upsert\",       \"slack notifications\"     ],     \"workflow_steps\": [       \"Watch for new Gmail messages\",       \"Filter non-business emails\",       \"Extract company and contact fields\",       \"Append or update the lead in Google Sheets\",       \"Notify the team in Slack\"     ],     \"tags\": [       \"gmail\",       \"google-sheets\",       \"slack\",       \"lead-generation\",       \"sales-ops\"     ],     \"required_credentials\": [       \"Gmail OAuth2\",       \"Google Sheets OAuth2\",       \"Slack OAuth2 or Bot Token\"     ]   },   {     \"name\": \"Automate RSS-to-social media with AI summaries and image generation\",     \"description\": \"Reads articles from RSS feeds, creates AI-generated summaries and images, publishes to Facebook and Instagram, logs results in Google Sheets, and sends Telegram notifications.\",     \"use_case\": [       \"social media publishing\",       \"rss automation\",       \"ai summarization\",       \"ai image generation\"     ],     \"apps\": [       \"RSS Feed\",       \"AI Model\",       \"Facebook\",       \"Instagram\",       \"Google Sheets\",       \"Telegram\"     ],     \"difficulty\": \"intermediate\",     \"setup_notes\": \"Requires access to an AI model, Meta Graph API credentials for Facebook and Instagram, Google Sheets, and Telegram bot credentials.\",     \"categories\": [       \"Content Creation\",       \"Social Media\"     ],     \"key_features\": [       \"rss ingestion\",       \"ai summaries\",       \"image generation\",       \"facebook publishing\",       \"instagram publishing\",       \"sheet logging\",       \"telegram notifications\"     ],     \"workflow_steps\": [       \"Fetch new RSS items\",       \"Extract article content\",       \"Generate a social summary using AI\",       \"Create an image based on the topic\",       \"Publish to Facebook and Instagram\",       \"Log publication details to Google Sheets\",       \"Send a Telegram notification\"     ],     \"tags\": [       \"rss\",       \"facebook\",       \"instagram\",       \"ai-content\",       \"google-sheets\",       \"telegram\"     ],     \"required_credentials\": [       \"AI model provider\",       \"Meta Graph API\",       \"Google Sheets OAuth2\",       \"Telegram API\"     ]   },   {     \"name\": \"Gmail to Telegram: email summaries with OpenAI GPT-4o\",     \"description\": \"Summarizes incoming Gmail messages with OpenAI and sends concise, human-style updates to Telegram.\",     \"use_case\": [       \"email summarization\",       \"telegram notification\",       \"ai assistant\",       \"personal productivity\"     ],     \"apps\": [       \"Gmail\",       \"OpenAI\",       \"Telegram\"     ],     \"difficulty\": \"beginner\",     \"setup_notes\": \"Requires Gmail, OpenAI, and Telegram credentials. Configure the Telegram chat destination and the summarization style.\",     \"categories\": [       \"AI Summarization\",       \"Messaging Automation\"     ],     \"key_features\": [       \"gmail monitoring\",       \"ai summaries\",       \"telegram delivery\",       \"language customization\"     ],     \"workflow_steps\": [       \"Detect a new Gmail email\",       \"Send the email content to OpenAI\",       \"Generate a concise summary\",       \"Send the summary to Telegram\"     ],     \"tags\": [       \"gmail\",       \"telegram\",       \"openai\",       \"summary\",       \"notifications\"     ],     \"required_credentials\": [       \"Gmail OAuth2\",       \"OpenAI API\",       \"Telegram API\"     ]   },   {     \"name\": \"Automate lead response with Google Sheets, OpenAI, Gmail, and Slack notifications\",     \"description\": \"Triggers on new lead rows in Google Sheets, uses OpenAI to draft a personalized response, sends the email through Gmail, and alerts the team in Slack.\",     \"use_case\": [       \"lead nurturing\",       \"sales outreach\",       \"email automation\",       \"ai personalization\"     ],     \"apps\": [       \"Google Sheets\",       \"OpenAI\",       \"Gmail\",       \"Slack\"     ],     \"difficulty\": \"intermediate\",     \"setup_notes\": \"Requires Google Sheets, OpenAI, Gmail, and Slack credentials. Prepare lead columns and review the email prompt before enabling automation.\",     \"categories\": [       \"Lead Nurturing\",       \"Sales Automation\"     ],     \"key_features\": [       \"sheet-triggered outreach\",       \"ai-personalized emails\",       \"gmail sending\",       \"slack notifications\"     ],     \"workflow_steps\": [       \"Watch for a new lead row in Google Sheets\",       \"Generate a personalized email with OpenAI\",       \"Send the message through Gmail\",       \"Notify the team in Slack\"     ],     \"tags\": [       \"google-sheets\",       \"gmail\",       \"openai\",       \"slack\",       \"lead-nurturing\"     ],     \"required_credentials\": [       \"Google Sheets OAuth2\",       \"OpenAI API\",       \"Gmail OAuth2\",       \"Slack OAuth2 or Bot Token\"     ]   },   {     \"name\": \"Summarize Gmail into Notion with OpenAI and create audio digests in Google Drive\",     \"description\": \"Turns incoming Gmail emails into structured AI summaries, saves them in Notion, and can generate audio digests stored in Google Drive.\",     \"use_case\": [       \"email summarization\",       \"knowledge management\",       \"notion automation\",       \"audio digest creation\"     ],     \"apps\": [       \"Gmail\",       \"OpenAI\",       \"Notion\",       \"Google Drive\"     ],     \"difficulty\": \"intermediate\",     \"setup_notes\": \"Requires Gmail, OpenAI, Notion, and Google Drive credentials. Configure the Notion database structure and the Google Drive destination folder.\",     \"categories\": [       \"Document Extraction\",       \"AI Summarization\"     ],     \"key_features\": [       \"gmail monitoring\",       \"ai summary generation\",       \"notion logging\",       \"audio digest output\",       \"google drive storage\"     ],     \"workflow_steps\": [       \"Watch for new Gmail emails\",       \"Generate a structured summary with OpenAI\",       \"Save the summary to Notion\",       \"Create an audio digest if enabled\",       \"Store the audio file in Google Drive\"     ],     \"tags\": [       \"gmail\",       \"notion\",       \"google-drive\",       \"openai\",       \"audio-digest\"     ],     \"required_credentials\": [       \"Gmail OAuth2\",       \"OpenAI API\",       \"Notion API\",       \"Google Drive OAuth2\"     ]   },   {     \"name\": \"Create a context-aware Slack assistant with Google Sheets, Pinecone, and GPT-4o\",     \"description\": \"Builds a Slack assistant that retrieves historical context from Google Sheets and Pinecone, then uses GPT-4o to produce personalized answers in Slack.\",     \"use_case\": [       \"slack assistant\",       \"rag assistant\",       \"context-aware support\",       \"internal knowledge assistant\"     ],     \"apps\": [       \"Slack\",       \"Google Sheets\",       \"Pinecone\",       \"OpenAI\"     ],     \"difficulty\": \"advanced\",     \"setup_notes\": \"Requires Slack bot setup, Google Sheets access, Pinecone vector database configuration, and OpenAI credentials. Historical data should be prepared before use.\",     \"categories\": [       \"AI Assistant\",       \"RAG\"     ],     \"key_features\": [       \"slack mention trigger\",       \"historical context retrieval\",       \"pinecone vector search\",       \"personalized responses\",       \"gpt-4o reasoning\"     ],     \"workflow_steps\": [       \"Detect a user message or bot mention in Slack\",       \"Retrieve previous context from Google Sheets and Pinecone\",       \"Assemble relevant context for the LLM\",       \"Generate a personalized answer with GPT-4o\",       \"Post the response back to Slack\"     ],     \"tags\": [       \"slack\",       \"pinecone\",       \"google-sheets\",       \"openai\",       \"rag\",       \"assistant\"     ],     \"required_credentials\": [       \"Slack Bot Token\",       \"Google Sheets OAuth2\",       \"Pinecone API\",       \"OpenAI API\"     ]   } ]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        160
+      ],
+      "id": "fa2053e3-6066-417f-81f6-49c20bb6db25",
+      "name": "Set",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        640,
+        784
+      ],
+      "id": "dea0434e-7a36-48df-a613-ba7bc3de52f2",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hRGZ8ddYb99TOkPi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "n8n-templates-db",
+          "mode": "list",
+          "cachedResultName": "n8n-templates-db"
+        },
+        "embeddingBatchSize": 1,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        784,
+        448
+      ],
+      "id": "7f9b8c37-bad2-41c8-afcc-57d391a3c559",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "cazOuswuzCaFGYMH",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Data Ingestion\n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 992,
+        "width": 2496,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1280,
+        32
+      ],
+      "typeVersion": 1,
+      "id": "9c980ba6-dcc9-4dc6-a7ec-db74147ebe05",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{$json[\"pageContent\"]}}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "template_id",
+                "value": "={{ $json.id }}"
+              },
+              {
+                "name": "template_url",
+                "value": "={{ \"https://n8n.io/workflows/\" + $json.id }}"
+              },
+              {
+                "name": "views",
+                "value": "={{ $json.totalViews }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        832
+      ],
+      "id": "28a26512-7d4b-4db9-8792-6abcedac582b",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "abc9a0e2-b521-4fe2-afbf-8c91a76ce5d8",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        1456,
+        256
+      ],
+      "webhookId": "6a3123d2-d405-4112-9c3b-910a6c4196ca",
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "content": "## RAG Chatbot\n**Double click** to edit me. [Guide](https://docs.n8n.io/workflows/sticky-notes/)",
+        "height": 928,
+        "width": 1184,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1360,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "8dd1f2e3-955a-4fd6-a468-34ac5071679e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a template recommendation assistant for n8n workflows.\n\nWhen answering:\n- Recommend up to 3 templates from the vector store\n- For each template, provide:\n  1. template name\n  2. what it does\n  3. why it matches the user's request\n  4. whether it is a strong match or alternative match\n- If a result is only partially relevant, say so clearly\n- Do not over-explain\n- Do not invent templates"
+        }
+      },
+      "id": "3d828b79-6a9a-42ec-9bc8-9591c0a4bd61",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        1744,
+        256
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        528
+      ],
+      "id": "4b6ffee8-d310-4922-b959-a62349cc3828",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hRGZ8ddYb99TOkPi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1744,
+        544
+      ],
+      "id": "b85d2941-807e-4fa2-afc5-aff16fa00ba6",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "=Use this tool to find relevant n8n workflow templates based on the user's automation goal, apps, triggers, and actions.\n\nThe database contains template titles, descriptions, integrations, and use cases.\n\nReturn the most relevant templates for the user's request.",
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "n8n-templates-db",
+          "mode": "list",
+          "cachedResultName": "n8n-templates-db"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        528
+      ],
+      "id": "12a2891e-7c63-4358-9b42-31b0cbf20140",
+      "name": "Qdrant Vector Store1",
+      "credentials": {
+        "qdrantApi": {
+          "id": "cazOuswuzCaFGYMH",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        784
+      ],
+      "id": "863c7939-c8a1-44b1-8187-0c3edc405df8",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hRGZ8ddYb99TOkPi",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        512
+      ],
+      "id": "22475921-f4f1-4149-a29e-6cc2d2eea4a2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://api.n8n.io/templates/search",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "search",
+              "value": "={{ $('Edit Fields').first().json.search }}"
+            },
+            {
+              "name": "rows",
+              "value": "50"
+            },
+            {
+              "name": "page",
+              "value": "={{ $('Edit Fields').first().json.page }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        496
+      ],
+      "id": "29446d47-abbe-447a-8473-24acf8894fee",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "739b343e-d529-4c59-a0cc-25936b5ef6d3",
+              "name": "page",
+              "value": 1,
+              "type": "number"
+            },
+            {
+              "id": "c1c8066b-cde9-43dd-8145-6d64f486e2c6",
+              "name": "allData",
+              "value": "[]",
+              "type": "array"
+            },
+            {
+              "id": "98b31f48-6aa4-466e-b52e-459c541a7fe5",
+              "name": "search",
+              "value": "RAG",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        496
+      ],
+      "id": "5c4beb51-69c3-4825-b433-351698377cd8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d6ef7409-b217-4659-ad55-dce17565c5ca",
+              "leftValue": "={{ $json.workflows.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        112,
+        496
+      ],
+      "id": "d26d69c8-928a-4616-8393-7591f7d71a6c",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const currentPage = $('Edit Fields').first().json.page;\nreturn [{ json: { page: currentPage + 1 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1136,
+        480
+      ],
+      "id": "aafae081-7b28-493c-ba5c-bd514a51e89d",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "workflows",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        368,
+        448
+      ],
+      "id": "c53eb36b-8c82-44e3-8a88-d18f8f994690",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://382a1899-fc93-42dc-9c53-636eac937127.us-east4-0.gcp.cloud.qdrant.io/collections/n8n-templates-db\n/points/delete",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"filter\": {}\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -304,
+        1120
+      ],
+      "id": "00109465-6561-46b9-a2c4-faf93db91ab5",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vO5hruLov35FA55N",
+          "name": "Auth Qdrant"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const d = item.json;\n  return {\n    json: {\n      pageContent: [\n        \"Template: \" + (d.name || ''),\n        \"Description: \" + (d.description || ''),\n        \"Use cases: \" + (d.use_case ? d.use_case.join(', ') : ''),\n        \"Apps: \" + (d.apps ? d.apps.join(', ') : ''),\n        \"Difficulty: \" + (d.difficulty || '')\n      ].join('\\n'),\n      metadata: {\n        template_id: d.id,\n        template_url: \"https://n8n.io/workflows/\" + d.id,\n        name: d.name || '',\n        views: d.totalViews || 0\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        432
+      ],
+      "id": "9d9a47b7-89ad-4799-b5a7-1b74c42b5b99",
+      "name": "Code in JavaScript2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "b869205b-958c-4523-af79-cfb03f05fecf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7b8dbb992efeadf896836c2162881d62e52d89788fa815e48cec16db1613a564"
+  },
+  "id": "RbZG9lJAOuLgib3i",
+  "tags": []
+}
