@@ -1,0 +1,565 @@
+{
+  "name": "Automatically Add Daily Prayer & Sunnah Fasting Reminders to Google Calendar (n8n)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -624,
+        -16
+      ],
+      "id": "63df3eed-52ff-4705-b393-0037aed6deee",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "start": "={{ $json.start }}",
+        "end": "={{ $json.end }}",
+        "additionalFields": {
+          "summary": "={{ $json.title }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        2256,
+        16
+      ],
+      "id": "2891ea9a-c612-4ea4-a9c6-bc6fa78d0a01",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "kpYq3itVIVh6ki2U",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  fajr: $json.data.timings.Fajr,\n  dhuhr: $json.data.timings.Dhuhr,\n  asr: $json.data.timings.Asr,\n  maghrib: $json.data.timings.Maghrib,\n  isha: $json.data.timings.Isha,\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -16
+      ],
+      "id": "11f57159-2766-4fce-be5e-597538882b2a",
+      "name": "reformat prayer"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prayer = $items(\"reformat prayer\")[0].json;\n\nconst events = [];\n\nevents.push({title: \"Shalat Subuh\", time: prayer.fajr});\nevents.push({title: \"Shalat Dzuhur\", time: prayer.dhuhr});\nevents.push({title: \"Shalat Ashar\", time: prayer.asr});\nevents.push({title: \"Shalat Maghrib\", time: prayer.maghrib});\nevents.push({title: \"Shalat Isya\", time: prayer.isha});\n\n// Doa\nevents.push({title: \"Doa Pagi\", time: prayer.fajr});\nevents.push({title: \"Doa Petang\", time: prayer.asr});\n\n// Ayamul Bidh\nif ($json.isAyamulBidh) {\n  events.push({title: \"Puasa Sunnah Ayamul Bidh\", time: \"04:30\"});\n}\n\nconst today = $now.setZone(\"Asia/Jakarta\").toFormat(\"yyyy-MM-dd\");\n\nreturn events.map(e => {\n  const cleanTime = e.time.split(\" \")[0];\n\n  // 🔥 tambah durasi 10 menit\n  const endTime = $moment(`${today} ${cleanTime}`)\n    .add(10, 'minutes')\n    .format('HH:mm:ss');\n\n  return {\n    json: {\n      title: `${e.title} - ${today}`,\n      start: `${today}T${cleanTime}:00`,\n      end: `${today}T${endTime}`\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1264,
+        -16
+      ],
+      "id": "fe467792-a8cc-4b39-803c-030ff00064b3",
+      "name": "merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "25ef6d6e-9072-436f-bf0a-ab93c3f8aafe",
+              "name": "city",
+              "value": "Bandung",
+              "type": "string"
+            },
+            {
+              "id": "b39259d8-b024-4964-b14e-da319ac9499f",
+              "name": "country",
+              "value": "Indonesia",
+              "type": "string"
+            },
+            {
+              "id": "e63e90c6-8438-40b9-ba02-fbb1ba347399",
+              "name": "end_day",
+              "value": "={{$now.setZone(\"Asia/Jakarta\").endOf(\"day\")}}",
+              "type": "string"
+            },
+            {
+              "id": "544bb871-e62a-4154-be8f-3012a5e86581",
+              "name": "start_day",
+              "value": "={{$now.setZone(\"Asia/Jakarta\").startOf(\"day\")}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "0d2c7791-9dcf-4e34-8fa4-b9f2a26f503a",
+      "name": "Set City and Country"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "timeMin": "={{ $json.start_day }}",
+        "timeMax": "={{ $json.end_day }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -80,
+        800
+      ],
+      "id": "79a6c56c-579a-4484-87ad-64e66cfc8c27",
+      "name": "Get Today Event",
+      "executeOnce": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "kpYq3itVIVh6ki2U",
+          "name": "Google Calendar OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "title",
+              "field2": "summary"
+            }
+          ]
+        },
+        "joinMode": "enrichInput1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1616,
+        32
+      ],
+      "id": "7eb04827-4d40-4f3e-bc2f-3a144b5fad6c",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "8fb4a9c3-fb5d-431f-bf03-12cacb5fa6a0",
+              "leftValue": "={{ $json.summary }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1904,
+        32
+      ],
+      "id": "90090881-b224-4744-834d-5bc0bd64730c",
+      "name": "IF Event Do not Exist"
+    },
+    {
+      "parameters": {
+        "content": "## Schedule Trigger & Location Setup\n- This workflow runs daily and allows you to configure your city and country.\n\n- Modify the \"Set City and Country\" node to match your location.\n- Default: Bandung, Indonesia\n- Change this to your own location",
+        "height": 560,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -688,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "6200b683-0b08-4280-9713-d747071207e6",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Fetch Prayer Times from API\nThis section retrieves daily prayer times based on the configured location.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "2b8ba2ff-68fd-4fd5-a1fa-2f6548486992",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Reformat Prayer\nCleans and formats prayer time data into a simpler structure for further processing.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        224,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "a22ddae1-b5d5-47cf-84c3-038ca11d9491",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Get Date (Hijri API)\n\nFetches today's Hijri date using Aladhan API.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "aa5c922d-c838-4627-987c-89046ba00071",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Hijri Date & Sunnah Logic\n\nChecks if today is 13, 14, or 15 Hijri.\nIf true, adds a sunnah fasting reminder event.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        864,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "3e0a0491-ca44-416d-9bac-88265534d19b",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Generate Events\n- Creates a list of events with title, start time, and end time.\n- Each item represents one calendar event.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1184,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "2dee38f8-1b4f-4199-9f72-65ae343e9970",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Check Existing Events\n- Matches new events with existing ones using title comparison.\n- Used to detect duplicates",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1504,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "b782dba2-57ff-4a84-aeb4-fbb656a21f1f",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## IF Event Do Not Exist\n\n- Checks if the event already exists in the calendar.\n- If not found → proceed to create event.\n- If found → skip.",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1824,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "ed8d287d-9405-495d-ab34-02b558170283",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Create an Event\nCreates events only if they do not already exist.\n\nDont forget to Set up your google calendar account",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2160,
+        -176
+      ],
+      "typeVersion": 1,
+      "id": "e34c45e3-18c7-4dc4-a1ef-c566f8a16742",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Get Today's Existing Events\n\n- Retrieve all events scheduled for today (00:00–23:59).\n- Used to prevent duplicate events from being created.\n\n\nDont forget to Set up your google calendar account",
+        "height": 560,
+        "width": 304,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "d421a0b2-a385-48a6-b59e-c57b76dd541d",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.aladhan.com/v1/timingsByCity?city={{ $json.city }}&country={{ $json.country }}&method=2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "70b0c7e4-19e7-4176-bb70-9f617c0cc0be",
+      "name": "Fetch Prayer Data"
+    },
+    {
+      "parameters": {
+        "url": "https://api.aladhan.com/v1/gToH",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "date",
+              "value": "={{$now.toFormat(\"dd-MM-yyyy\")}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        656,
+        -16
+      ],
+      "id": "8a83ce6b-9244-4fee-bc60-b138af6ac1e7",
+      "name": "get hijri date"
+    },
+    {
+      "parameters": {
+        "jsCode": "const day = parseInt($input.first().json.data.hijri.day);\n\nreturn [{\n  json: {\n    isAyamulBidh: [13,14,15].includes(day)\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        -16
+      ],
+      "id": "c287435e-4be9-453a-865b-a76e9ab5b4b4",
+      "name": "detect ayamul bidh date"
+    },
+    {
+      "parameters": {
+        "content": "🕌 Smart Prayer & Sunnah Reminder (Google Calendar + Hijri + n8n)\n\nThis workflow automatically creates daily Islamic reminders in your Google Calendar:\n\t•\t🕌 Daily prayer times (Subuh, Dzuhur, Ashar, Maghrib, Isya)\n\t•\t🌅 Morning & evening dhikr (Doa Pagi & Petang)\n\t•\t🌙 Sunnah fasting reminder (Ayamul Bidh – 13, 14, 15 Hijri)\n\nPrayer times are dynamically fetched based on your location, and Hijri dates are used to determine sunnah fasting days.\n\n⸻\n\n🔁 Flow\n\nSchedule Trigger\n→ Set City & Country\n→ Get Prayer Times (API)\n→ Format Data\n→ Get Hijri Date\n→ Detect Ayamul Bidh\n→ Generate Events\n→ Get Today’s Events (Google Calendar)\n→ Compare (Anti-Duplicate)\n→ Create Event (if not exists)\n\n⸻\n\n⚙️ Setup Guide\n\n1️⃣ Configure Location\n\nOpen node: Set City and Country\n\nReplace:\ncity: Bandung\ncountry: Indonesia\n\nWith your own location.\n\n⸻\n\n2️⃣ Google Calendar Credential\n\t1.\tAdd Google Calendar OAuth2 in n8n\n\t2.\tConnect your Google account\n\t3.\tSelect your calendar in the “Create Event” node\n\n⸻\n\n3️⃣ Set Schedule\n\nOpen: Schedule Trigger\n\nRecommended:\nRun once daily (e.g., 00:05 AM)\n\n⸻\n\n4️⃣ Activate Workflow\n\t•\tSave workflow\n\t•\tClick “Activate”\n\t•\tDone 🎉\n\n⸻\n\n⚠️ Important Notes\n\n🔁 Anti-Duplicate Protection\n\nThis workflow:\n\t•\tChecks existing events for today\n\t•\tCompares events by title\n\t•\tOnly creates new events if they do not already exist\n\n⸻\n\n🕒 Timezone\n\nMake sure your n8n timezone is set to:\nAsia/Jakarta\n\n⸻\n\n📅 Event Format\n\nEvents are created using:\n\t•\tSummary (title)\n\t•\tStart time\n\t•\tEnd time\n\n⸻\n\n💡 Customization Ideas\n\nYou can extend this workflow by:\n\t•\tSending reminders via Telegram / WhatsApp\n\t•\tUsing latitude & longitude instead of city\n\t•\tSupporting multiple users\n\t•\tAdding notification reminders\n\t•\tIntegrating AI for Islamic content\n\n⸻\n\n🏆 Use Case\n\nPerfect for:\n\t•\tDaily ibadah reminders\n\t•\tBuilding consistent habits\n\t•\tLearning n8n automation with real use case\n\n⸻\n\n🚀 Tips\n\nIf events are not created:\n\t•\tCheck Google Calendar credentials\n\t•\tEnsure workflow is active\n\t•\tVerify city & country input\n",
+        "height": 1888,
+        "width": 944
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1664,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "4223f56a-188e-4859-a0cd-c4e9462216c4",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set City and Country",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reformat prayer": {
+      "main": [
+        [
+          {
+            "node": "get hijri date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        []
+      ]
+    },
+    "Set City and Country": {
+      "main": [
+        [
+          {
+            "node": "Fetch Prayer Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Today Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Today Event": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "IF Event Do not Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Event Do not Exist": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Prayer Data": {
+      "main": [
+        [
+          {
+            "node": "reformat prayer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get hijri date": {
+      "main": [
+        [
+          {
+            "node": "detect ayamul bidh date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "detect ayamul bidh date": {
+      "main": [
+        [
+          {
+            "node": "merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "aeaa06b0-b690-4bc1-9ec4-6584984c2f89",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c406dd3b52aaf7ed9d99c9e4c431e85cbbdd0d117807e19681625a2f4d155145"
+  },
+  "id": "bmuzhJcQ1L5ZD6TH",
+  "tags": []
+}
