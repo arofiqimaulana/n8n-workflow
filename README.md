@@ -1,3 +1,3 @@
 # n8n-workflow
 
-Backup workflows from n8n
+Dokumentasi workflow n8n yang pernah saya buat. Selengkapnya bisa dilihat di https://n8n.io/creators/arofiqimaulana/ 
